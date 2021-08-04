@@ -1,19 +1,18 @@
-import collections
-
 import requests
+import sqlite3
+import sqlitedb
+from sqlite3 import Error
+import json
 
-import track
-
-CLIENT_ID = '421291cdff10468d98da0d3fe8424204'
-CLIENT_SECRET = '44cb2d1956cc4020a06351fb498188bb'
+config = json.load(open('config.json'))
 
 AUTH_URL = 'https://accounts.spotify.com/api/token'
 
 # POST
 auth_response = requests.post(AUTH_URL, {
     'grant_type': 'client_credentials',
-    'client_id': CLIENT_ID,
-    'client_secret': CLIENT_SECRET,
+    'client_id': config['spotify']['client_id'],
+    'client_secret': config['spotify']['client_secret'],
 })
 
 # convert the response to JSON
@@ -30,28 +29,55 @@ headers = {
 BASE_URL = 'https://api.spotify.com/v1/'
 
 
-def user_playlist_tracks_full(spotify_connection, user, playlist_id=None, fields=None, market=None):
-    """ Get full details of the tracks of a playlist owned by a user.
-        https://developer.spotify.com/documentation/web-api/reference/playlists/get-playlists-tracks/
+# given spotify playlist_id and database file, this populates db_file with songs from playlist_id
+def get_playlist_db(playlist_id, db_file, playlist_name):
+    # create a database connection
+    conn = sqlitedb.create_connection(db_file)
 
-        Parameters:
-            - user - the id of the user
-            - playlist_id - the id of the playlist
-            - fields - which fields to return
-            - market - an ISO 3166-1 alpha-2 country code.
-    """
+    database = (0, playlist_name)
 
-    # first run through also retrieves total no of songs in library
-    response = spotify_connection.user_playlist_tracks(user, playlist_id, fields=fields, limit=100, market=market)
+    sql_create_databases_table = """ CREATE TABLE IF NOT EXISTS databases (
+                                            id integer PRIMARY KEY,
+                                            local integer NOT NULL,
+                                            name text NOT NULL
+                                        ); """
+
+    sql_create_songs_table = """CREATE TABLE IF NOT EXISTS songs (
+                                        id integer PRIMARY KEY,
+                                        name text NOT NULL,
+                                        artist text NOT NULL,
+                                        album textNOT NULL,
+                                        duration integer NOT NULL,
+                                        database_id text NOT NULL,
+                                        FOREIGN KEY (database_id) REFERENCES databases (id)
+                                    );"""
+
+    # create songs and databases tables
+    sqlitedb.create_table(conn, sql_create_databases_table)
+    sqlitedb.create_table(conn, sql_create_songs_table)
+
+    # create tables
+    if conn is not None:
+        # create new database
+        database_id = sqlitedb.create_db(conn, database)
+    else:
+        print("Error! cannot create the database connection.")
+        return
+
+    response = requests.get(BASE_URL + 'playlists/' + playlist_id + '/tracks', headers=headers, params=get_params(None))
+    response = response.json()
     results = response['items']
-
-    # subsequently runs until it hits the user-defined limit or has read all songs in the library
-    while len(results) < response['total']:
-        response = spotify_connection.user_playlist_tracks(
-            user, playlist_id, fields=fields, limit=100, offset=len(results), market=market
-        )
-        results.extend(response['items'])
-    return results
+    while len(results) < response["total"]:
+        response = requests.get(BASE_URL + 'playlists/' + playlist_id + '/tracks', headers=headers,
+                                params=get_params(len(results)))
+        results.extend(response.json()['items'])
+        response = response.json()
+    for t in results:
+        if t['track'] is None:
+            continue
+        track = (t['track']['name'], t['track']['artists'][0]['name'], t['track']['album']['name'],
+                 round(int(t['track']['duration_ms'])/1000), database_id)
+        sqlitedb.create_song(conn, track)
 
 
 def get_params(results):
@@ -65,51 +91,3 @@ def get_params(results):
             "offset": results
         }
     return params
-
-
-# given playlist_id, makes deck of Tracks
-# Tracklist will call this
-def get_playlist(playlist_id):
-    response = requests.get(BASE_URL + 'playlists/' + playlist_id + '/tracks', headers=headers, params=get_params(None))
-    response = response.json()
-    # allTracks = user_playlist_tracks_full(r.json(), CLIENT_ID, playlist_id)
-    results = response['items']
-    # headers1 =
-    while len(results) < response["total"]:
-        response = requests.get(BASE_URL + 'playlists/' + playlist_id + '/tracks', headers=headers,
-                                params=get_params(len(results)))
-        # response = response.json()
-        # print(str(len(allTracks)))
-        # print(get_params(str(len(results))))
-        # print(results[0]['track']['name'])
-        # response = response.json()['items']
-        results.extend(response.json()['items'])
-        response = response.json()
-    playlistD = collections.deque([])
-    a = 0
-    for t in results:
-        # todo: have it contain all artists maybe
-        # print(a)
-        a += 1
-        if t['track'] is None:
-            # print("hi")
-            continue
-        playlistD.append(
-            track.Track(t['track']['name'], t['track']['album']['name'], t['track']['artists'][0]['name'],
-                        t['track']['duration_ms']))
-        # print(t['track']['name'])
-    return playlistD
-
-
-def get_playlistAll(playlist_id):
-    r = requests.get(BASE_URL + 'playlists/' + playlist_id, headers=headers)
-    # results = user_playlist_tracks_full(requests, CLIENT_ID, playlist_id)
-    r = r.json()
-    playlistD = collections.deque([])
-    for t in r['tracks']['items']:
-        # todo: have it contain all artists maybe
-        playlistD.append(
-            track.Track(t['track']['name'], t['track']['album']['name'], t['track']['artists'][0]['name'],
-                        t['track']['duration_ms']))
-        # print(t['track']['name'])
-    return playlistD
