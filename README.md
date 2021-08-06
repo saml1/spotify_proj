@@ -6,7 +6,7 @@ python main.py -h
 
 1.
 First, create a config file: 
-python3 main.py cc -s1 <YOUR_SPOTIFY_CLIENT_ID> -s2 <YOUR_SPOTIFY_CLIENT_SECRET> -a <YOUR_ACOUSTID_API_KEY> -d <YOUR_DISCOGS_API_TOKEN> -cf <ENTER DIRECTORY TO SAVE CONFIG FILE TO>
+python3 main.py cc -s1 <YOUR_SPOTIFY_CLIENT_ID> -s2 <YOUR_SPOTIFY_CLIENT_SECRET> -a <YOUR_ACOUSTID_API_KEY> -d <YOUR_DISCOGS_API_TOKEN> -cf ENTER DIRECTORY TO SAVE CONFIG FILE TO>
 
 2.
 Once a config file is created, add a Spotify playlist:
