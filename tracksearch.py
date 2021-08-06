@@ -1,3 +1,4 @@
+import json
 import os
 import acoustid
 import discogs_client
@@ -6,15 +7,16 @@ import sqlitedb
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 
-api_key = 'qXbtA2BdWX'
+config = json.load(open('config.json'))
+api_key = config['acoustid']['api_key']
 lookup_url = 'https://api.acoustid.org/v2/lookup'
-discogs_token = 'OipPZbYAlYjleYEeYFIekZIaqDEMaQPhPsthLZnI'
 
-usertoken = 'OipPZbYAlYjleYEeYFIekZIaqDEMaQPhPsthLZnI'
+usertoken = config['discogs']['token']
 
 # instantiate our discogs_client object.
 discogsclient = discogs_client.Client('spotify_proj/0.1', user_token=usertoken)
 
+# returns true if no error occurs, returns false if error occurs
 def get_local_db_correct_metadata(directory, db_file, database_name):
     # create a database connection
     conn = sqlitedb.create_connection(db_file)
@@ -47,7 +49,7 @@ def get_local_db_correct_metadata(directory, db_file, database_name):
         database_id = sqlitedb.create_db(conn, database)
     else:
         print("Error! cannot create the database connection.")
-        return
+        return False
     for subdir, dirs, files in os.walk(directory):
         for filename in files:
             filepath = subdir + os.sep + filename
@@ -55,6 +57,7 @@ def get_local_db_correct_metadata(directory, db_file, database_name):
                 audio = EasyID3(filepath)
                 track = (audio['title'][0], audio['artist'][0], audio['album'][0], int(MP3(filepath).info.length), database_id)
                 sqlitedb.create_song(conn, track)
+    return True
 
 
 def get_local_db(directory, db_file, database_name):

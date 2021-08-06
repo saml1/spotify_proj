@@ -40,8 +40,11 @@ def main():
         spotify.get_playlist_db(args.playlist_id, r'{}'.format(args.database_file), args.playlist_name)
         print("added to database: " + args.playlist_name)
     elif args.mode == 'add_directory' or args.mode == 'ad':
-        tracksearch.get_local_db_correct_metadata(args.directory, r'{}'.format(args.database_file), args.database_name)
-        print("Added db " + args.database_name + "in " + args.directory)
+        tp = tracksearch.get_local_db_correct_metadata(args.directory, r'{}'.format(args.database_file), args.database_name)
+        if tp:
+            print("Added db " + args.database_name + " in " + args.directory)
+        else:
+            print("Unable to add " + args.database_name + " to " + args.directory)
     elif args.mode == 'get_dupes' or args.mode == 'gd':
         sqlitedb.get_dupes(args.database_file, args.database_1, args.database_2)
 

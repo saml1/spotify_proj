@@ -14,7 +14,7 @@ def create_connection(db_file):
         conn = sqlite3.connect(db_file)
         return conn
     except Error as e:
-        print(e)
+        print("Error: " + str(e))
 
     return conn
 
@@ -28,8 +28,10 @@ def create_table(conn, create_table_sql):
     try:
         c = conn.cursor()
         c.execute(create_table_sql)
-    except Error as e:
-        print(e)
+        return True
+    except AttributeError as e:
+        print('(For debugging): ' + str(e))
+        return False
 
 
 def create_db(conn, database):
@@ -66,7 +68,10 @@ def create_song(conn, song):
 # given db file, prints list of all songs in both db1 (name) and db2 (name)
 def get_dupes(db_file, d1, d2):
     conn = create_connection(db_file)
-    cur = conn.cursor()
+    try:
+        cur = conn.cursor()
+    except AttributeError:
+        return
     cur.execute('''SELECT * FROM databases WHERE name=?''', (d1,))
     # d1_id is database_id of database with name d1 and d2_id for for d2
     d1_id = cur.fetchall()[0][0]
@@ -78,7 +83,10 @@ def get_dupes(db_file, d1, d2):
     d2_songs = cur.fetchall()
     for song in d1_songs:
         cur = conn.cursor()
-        cur.execute("SELECT * FROM songs WHERE database_id=? AND name=? AND artist=? AND album=?", (d2_id, song[1],song[2], song[3],))
+        # selecting matches (but allowing for 10-second difference in duration)
+        cur.execute("SELECT * FROM songs "
+                    "WHERE database_id=? AND name=? AND artist=? AND album=? AND duration BETWEEN ? and ?",
+                    (d2_id, song[1],song[2], song[3], song[4] - 10, song[4] + 10))
         match = cur.fetchall()
         if len(match) > 0:
             print(match[0])
