@@ -67,7 +67,7 @@ def create_song(conn, song):
 
 # given db file, prints list of all songs in both db1 (name) and db2 (name)
 def get_dupes(db_file, d1, d2):
-    conn = create_connection(os.getcwd() + '/database.db')
+    conn = create_connection(os.getcwd() + '/libraries.db')
     try:
         cur = conn.cursor()
     except AttributeError:

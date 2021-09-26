@@ -19,7 +19,7 @@ def get_local_db_correct_metadata(directory, db_file, database_name):
     discogsclient = discogs_client.Client('spotify_proj/0.1', user_token=usertoken)
 
     # create a database connection
-    conn = sqlitedb.create_connection(db_file)
+    conn = sqlitedb.create_connection(os.getcwd() + '/libraries.db')
 
     database = (0, database_name)
 

@@ -3,7 +3,7 @@ import sqlite3
 import sqlitedb
 from sqlite3 import Error
 import json
-
+import os
 
 # given spotify playlist_id and database file, this populates db_file with songs from playlist_id
 def get_playlist_db(playlist_id, db_file, playlist_name):
@@ -32,7 +32,7 @@ def get_playlist_db(playlist_id, db_file, playlist_name):
     BASE_URL = 'https://api.spotify.com/v1/'
 
     # create a database connection
-    conn = sqlitedb.create_connection(db_file)
+    conn = sqlitedb.create_connection(os.getcwd() + '/libraries.db')
 
     database = (0, playlist_name)
 
