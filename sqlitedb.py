@@ -1,6 +1,6 @@
 import sqlite3
 from sqlite3 import Error
-
+import os
 
 def create_connection(db_file):
     """ create a database connection to the SQLite database
@@ -67,7 +67,7 @@ def create_song(conn, song):
 
 # given db file, prints list of all songs in both db1 (name) and db2 (name)
 def get_dupes(db_file, d1, d2):
-    conn = create_connection(db_file)
+    conn = create_connection(os.getcwd() + '/database.db')
     try:
         cur = conn.cursor()
     except AttributeError:
