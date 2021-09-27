@@ -9,15 +9,6 @@ from mutagen.mp3 import MP3
 
 # returns true if no error occurs, returns false if error occurs
 def get_local_db_correct_metadata(directory, db_file, database_name):
-    config = json.load(open('config.json'))
-    api_key = config['acoustid']['api_key']
-    lookup_url = 'https://api.acoustid.org/v2/lookup'
-
-    usertoken = config['discogs']['token']
-
-    # instantiate our discogs_client object.
-    discogsclient = discogs_client.Client('spotify_proj/0.1', user_token=usertoken)
-
     # create a database connection
     conn = sqlitedb.create_connection(os.getcwd() + '/libraries.db')
 
@@ -65,13 +56,9 @@ def get_local_db(directory, db_file, database_name):
     api_key = config['acoustid']['api_key']
     lookup_url = 'https://api.acoustid.org/v2/lookup'
 
-    usertoken = config['discogs']['token']
-
-    # instantiate our discogs_client object.
-    discogsclient = discogs_client.Client('spotify_proj/0.1', user_token=usertoken)
 
     # create a database connection
-    conn = sqlitedb.create_connection(db_file)
+    conn = sqlitedb.create_connection(os.getcwd() + '/libraries.db')
 
     database = (0, database_name)
 
@@ -167,8 +154,6 @@ def get_local_db(directory, db_file, database_name):
 # returns true if file has correct album + artist + title
 def has_correct_metadata(filepath):
     config = json.load(open('config.json'))
-    api_key = config['acoustid']['api_key']
-    lookup_url = 'https://api.acoustid.org/v2/lookup'
 
     usertoken = config['discogs']['token']
 
@@ -210,8 +195,6 @@ def has_correct_metadata(filepath):
 # returns None if album/artist are incorrect, else returns master release with correct album/artist
 def valid_master(filepath):
     config = json.load(open('config.json'))
-    api_key = config['acoustid']['api_key']
-    lookup_url = 'https://api.acoustid.org/v2/lookup'
 
     usertoken = config['discogs']['token']
 
