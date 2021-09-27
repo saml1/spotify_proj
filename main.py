@@ -3,7 +3,7 @@ import argparse
 import spotify
 import sqlitedb
 import tracksearch
-
+import os
 
 # todo: add more options, for now just create config file
 # todo: add try/catch blocks for possible errors
@@ -35,29 +35,29 @@ def main():
     if args.mode == 'create_config' or args.mode == 'cc':
         args = parser.parse_args()
         create_config(args.spotify_client_id, args.spotify_client_secret, args.acoustid,
-                      args.discogs, args.config_filepath)
+                      args.discogs)
     elif args.mode == 'add_playlist' or args.mode == 'ap':
-        spotify.get_playlist_db(args.playlist_id, r'{}'.format(args.database_file), args.playlist_name)
+        spotify.get_playlist_db(args.playlist_id, args.playlist_name)
         print("added to database: " + args.playlist_name)
     elif args.mode == 'add_directory' or args.mode == 'ad':
-        tp = tracksearch.get_local_db_correct_metadata(args.directory, r'{}'.format(args.database_file), args.database_name)
+        tp = tracksearch.get_local_db_correct_metadata(args.directory, args.database_name)
         if tp:
             print("Added db " + args.database_name + " in " + args.directory)
         else:
             print("Unable to add " + args.database_name + " to " + args.directory)
     elif args.mode == 'get_dupes' or args.mode == 'gd':
-        sqlitedb.get_dupes(args.database_file, args.database_1, args.database_2)
+        sqlitedb.get_dupes(args.database_1, args.database_2)
 
 
 # creates file config.json with clientId and Path
-def create_config(spotify_client_id, spotify_client_secret, acoustid_api_key, discogs_token, config_filepath):
+def create_config(spotify_client_id, spotify_client_secret, acoustid_api_key, discogs_token):
     config = {'spotify': {'client_id': spotify_client_id, 'client_secret': spotify_client_secret},
               'acoustid': {'api_key': acoustid_api_key},
               'discogs': {'token': discogs_token}}
     # json_file_path = 'config.json'
-    with open(config_filepath + '/config.json', 'w') as jsonFile:
+    with open(os.getcwd() + '/config.json', 'w') as jsonFile:
         jsonFile.write(json.dumps(config, indent=4))
-    print("created config.json at " + config_filepath)
+    print("created config.json")
 
 
 if __name__ == "__main__":

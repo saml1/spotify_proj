@@ -6,7 +6,7 @@ import json
 import os
 
 # given spotify playlist_id and database file, this populates db_file with songs from playlist_id
-def get_playlist_db(playlist_id, db_file, playlist_name):
+def get_playlist_db(playlist_id, playlist_name):
     config = json.load(open('config.json'))
 
     AUTH_URL = 'https://accounts.spotify.com/api/token'

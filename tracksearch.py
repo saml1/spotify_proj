@@ -8,7 +8,7 @@ from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 
 # returns true if no error occurs, returns false if error occurs
-def get_local_db_correct_metadata(directory, db_file, database_name):
+def get_local_db_correct_metadata(directory, database_name):
     # create a database connection
     conn = sqlitedb.create_connection(os.getcwd() + '/libraries.db')
 
@@ -51,7 +51,7 @@ def get_local_db_correct_metadata(directory, db_file, database_name):
     return True
 
 
-def get_local_db(directory, db_file, database_name):
+def get_local_db(directory, database_name):
     config = json.load(open('config.json'))
     api_key = config['acoustid']['api_key']
     lookup_url = 'https://api.acoustid.org/v2/lookup'
