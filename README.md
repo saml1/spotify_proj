@@ -10,7 +10,7 @@ For usage, enter:
 
 1.
 First, create a config file: 
-`python3 main.py cc -s1 <YOUR_SPOTIFY_CLIENT_ID> -s2 <YOUR_SPOTIFY_CLIENT_SECRET> -a <YOUR_ACOUSTID_API_KEY> -d <YOUR_DISCOGS_API_TOKEN>
+`python3 main.py cc -s1 <YOUR_SPOTIFY_CLIENT_ID> -s2 <YOUR_SPOTIFY_CLIENT_SECRET> -a <YOUR_ACOUSTID_API_KEY> -d <YOUR_DISCOGS_API_TOKEN>`
 
 2.
 Once a config file is created, add a Spotify playlist:
