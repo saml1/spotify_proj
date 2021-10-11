@@ -14,16 +14,12 @@ First, create a config file:
 
 2.
 Once a config file is created, add a Spotify playlist:
-`python3 main.py ap -pid <PLAYLIST_ID> -pn <ENTER PLAYLIST NAME>`
+`python3 main.py ap -pid <PLAYLIST_ID> -ln <ENTER PLAYLIST NAME>`
 
 3.
 Then add a local directory:
-`python3 main.py ad -dir <ENTER DIRECTORY CONTAINING MP3 FILES> -dbn <GIVE NAME FOR SONGS COMING FROM THIS DIRECTORY>`
+`python3 main.py ad -dir <ENTER DIRECTORY CONTAINING MP3 FILES> -ln <GIVE NAME FOR SONGS COMING FROM THIS DIRECTORY>`
 
 4.
 Then to output songs that exist in both the Spotify playlist and local directory:
-`python3 main.py gd -d1 <SPOTIFY PLAYLIST NAME following -pn in step 2> -d2 <LOCAL SONGS NAME following -dbn in step 3>`
-
-
-Note: for `-db` command, be sure to end include database file (databasename.db) at end of directory. If the specified database does not exist, one will be created.
-EX: /Users/samlipschitz/Documents/spotify_proj/database.db
+`python3 main.py gd -d1 <SPOTIFY PLAYLIST NAME following -ln in step 2> -d2 <LOCAL SONGS NAME following -ln in step 3>`
